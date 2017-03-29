@@ -33,21 +33,14 @@ conta --;
 
 rr1r234r56789
 
-r124579 r0
-r13467 r1
-r23489 r2
-r56789 r3
 
+r3   r56789
+r2   r23489 
+r1   r13467 
+r0   r124579 
 
 */
 
-
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  *
@@ -126,16 +119,26 @@ public class HammingGIT {
     }
     /*
         Cria um Array int 'R' com tamanho da quantidade de r's
+        Cria Contador que vai ser usado para pular os negocios
+        Cria uma subString auxiliar
+        While que vai executar na quantidade de Rs presentes no sistema do maior para o menor
+        Inicializa o contador antes do for com a quantidade de casas que ele pula
+        For irá passar por todos os elementos da String
+        Primeiro if pra definir o primeiro valor da subString;
+        Segundo if Verifica se o intervalo de não pega dos itens foi completo
+        Terceiro if é para atribuir o valor a substring;
+        Depois do for você tem que atribuir o valor do determinado R;
+        
+        
         TA FUNCIONANDO 
         SÓ CONTAR OS 1 GG
     
     */
     public static int[] valorDeCadaR(int r, String hamming) {
         int[] R = new int[r];
-        int parOuImpar = 0;
         int contador;
         String subString ="";
-        while(r >= 0)
+        while(r > 0)
         {
             r --;
             contador = (int)Math.pow(2, r);
