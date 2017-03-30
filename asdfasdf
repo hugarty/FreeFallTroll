@@ -1,14 +1,9 @@
 import java.util.Scanner;
 
-/**
- *
- * @author RA21450285
- */
 public class HammingGIT {
     public static void main(String[] args) {
         
         String mensagemComRedundancia;
-        String retorno ="";
         Scanner l = new Scanner(System.in);
         System.out.print("Emissor -\nDigite sua mensagem\n");
         String entrada = l.nextLine();
@@ -20,37 +15,55 @@ public class HammingGIT {
         System.out.println("Quer gerar um erro? Digite 'y' para sim e qualquer outra letra para não.");
         
         if ("y".equals(l.nextLine())) {
-            System.out.println("Digite o posicao que quer alterar de 1 a " + (mensagemComRedundancia.length()) + ".");
+            System.out.println("Digite o posição que quer alterar de 1 a " + (mensagemComRedundancia.length()) + ".");
             int posicao = l.nextInt();
-            System.out.println("\n");
+            System.out.println("----------------------------------\n");
             mensagemComRedundancia = geraErro(mensagemComRedundancia, posicao - 1);
         }
         
         receptor(mensagemComRedundancia, r);
     }
 
+    /*
+        Programa receptor recebe a mensagem já com redundancias e a quantidade de redundancias
+        Verifica se tem erros gerando um retorno, caso o retorno tenha algum numero 1
+    o programa altomaticamente executa a correção de erros (linha 46).
+        Caso não tenha erros ele retira os valores redundantes e "envia" para camada de rede a mensagem.
+    */
     public static void receptor(String msgComR, int r) {
         String retorno;
         
         System.out.println("\nReceptor -");
         msgComR = giraString(msgComR);
         retorno = valorDeCadaR(r, msgComR);
+        System.out.println("Retorno: "+retorno);
+        
         if(contaUns(retorno, 'a'))
         {
-            System.out.println("Teve erro.\nRetorno: "+retorno+"\nCorrigindo erro...\n");
+            System.out.println("Houve erro.\nCorrigindo erro...\n----------------------------------");
             receptor(geraErro(giraString(msgComR), binarioToDeci(retorno) -1), r); 
-        }else
-            System.out.println("Não teve erro.\nRetorno: "+retorno+"\nEnviando a mensagem: "+giraString(msgComR)+".");
+        }else{
+            System.out.println("Enviando mensagem sem redundancias: "+ removeRs(r, msgComR));
+        }
     }
-
+    
+    /*
+        Emissor recebe a mensagem
+        Adiciona a quantidade de rendundacia à mensagem
+        Depois adiciona o valor de cada redundancia
+        E retorna a mensagem com os valores de redundancia
+    */
     public static String emissor(String hamming, int r) {
         String rs;
-
         hamming = adicionaRs(r, hamming);
         rs = valorDeCadaR(r, hamming);
         return alteraValoresR(rs, hamming);
     }
 
+    /*
+        Metodo para descobrir a quantidade de redundancias que aquela 
+    mensagem irá ter.
+    */
     public static int descobrirQuantidadeR(int tamanho) {
         int r = 0;
         do {
@@ -60,11 +73,9 @@ public class HammingGIT {
     }
 
     /* 
-        Gira a mensagem para adicionar os Rs na parte de inicial da mensagem
-        Cria o Array char addR com tamanho de msg + quantidad de Rs
-        Primeiro 'for' Joga a mensagem dentro do Array
-        Segundo 'for' adiciona os Rs nas posições deles dentro do Array
-        Terceiro 'for' joga os valores do Array dentro da String
+        Metodo usado para adicionar as redundancias nas posições corretas
+    da mensagem.
+        Esse metodo não atribui valores às redundancias. Só as posiciona.
      */
     private static String adicionaRs(int r, String hamming) {
         hamming = giraString(hamming);
@@ -91,22 +102,35 @@ public class HammingGIT {
         }
         return hamming;
     }
-
+    
     /*
-        Cria um Array int 'R' com tamanho da quantidade de r's
-        Cria Contador que vai ser usado para pular os negocios
-        Cria uma subString auxiliar
-        While que vai executar na quantidade de Rs presentes no sistema do maior para o menor
-        Inicializa o contador antes do for com a quantidade de casas que ele pula
-        For irá passar por todos os elementos da String
-        Primeiro if pra definir o primeiro valor da subString;
-        Segundo if Verifica se o intervalo de não pega dos itens foi completo
-        Terceiro if é para atribuir o valor a substring;
-        Depois do for você tem que atribuir o valor do determinado R;
+        Metodo usado para remover as redundancias antes de enviar a mensagem.
+    */
+    private static String removeRs(int r, String hamming)
+    {
+        char [] charray = hamming.toCharArray();
+        int cont = 0;
         
-        
-        TA FUNCIONANDO 
-        SÓ CONTAR OS 1 GG
+        for(int i = 0; i < hamming.length(); i++){
+            if(i == Math.pow(2, cont)-1){
+                charray[i] = 'x';
+                if(cont < r - 1)
+                    cont ++;
+            }
+        }
+        hamming = "";
+        for(int i = 0; i < charray.length; i++)
+        {
+            if(charray[i] != 'x')                
+                hamming += charray[i];
+        }        
+        return giraString(hamming);
+    }
+    /*
+        Metodo usado para retornar o valor correto a cada redundancia já
+    presente na mensagem.
+        Ele usa o metodo contaUns para retornar os valores de cada R.
+        Ele não atribui valores, só retorna os valores de cada redundancia.
      */
     public static String valorDeCadaR(int r, String hamming) {
         String Erres = "";
@@ -129,12 +153,16 @@ public class HammingGIT {
             }
 
             Erres += contaUns(subString);
-//            System.out.println("R" + r + "  " + subString+" = \t"+ contaUns(subString));
             subString = "";
         }
         return Erres;
     }
 
+    /*
+        Esse primeiro contaUns é utilizado para verificar se a string
+    recebida tem um valor de numeros 1 impar ou par e retorna o valor para
+    modificar ou deixar ela par.
+    */
     public static int contaUns(String stringAuxiliar) {
         int contador = 0;
         for (int i = 0; i < stringAuxiliar.length(); i++) {
@@ -148,6 +176,11 @@ public class HammingGIT {
             return 1;
         }
     }
+    
+    /*
+        Segundo conta uns é usado para verificar se tem erros na mensagem
+    recebida pelo receptor. Caso tenha retorna true.
+    */
     public static boolean contaUns(String stringAuxiliar, char receptor) {
         int contador = 0;
         for (int i = 0; i < stringAuxiliar.length(); i++) {
@@ -158,6 +191,9 @@ public class HammingGIT {
         return contador > 0;
     }
 
+    /*
+        Gira a String, metodo auxiliar para facilitar a execução o código.
+    */
     private static String giraString(String hamming) {
         int cont = 0;
         String auxiliar = "";
@@ -173,7 +209,10 @@ public class HammingGIT {
         }
         return hamming;
     }
-
+    
+    /*
+        Metodo auxliar para facilitar a execução do código.
+    */
     private static char[] jogaParaFrenteValores(char[] addR, int o) {
         for (int i = addR.length; i >= o; i--) {
             if (i + 1 < addR.length) {
@@ -183,6 +222,10 @@ public class HammingGIT {
         return addR;
     }
 
+    /*
+        Metodo que altera o valores das redundancias conforme os valors
+    recebido no array "rs".
+    */
     private static String alteraValoresR(String rs, String hamming) {
         char[] auxiliar = hamming.toCharArray();
         int cont = 0;
@@ -192,9 +235,7 @@ public class HammingGIT {
                 cont++;
             }
         }
-
         hamming = "";
-
         for (int i = 0; i < auxiliar.length; i++) {
             hamming += "" + auxiliar[i];
         }
@@ -202,6 +243,10 @@ public class HammingGIT {
         return hamming;
     }
 
+    /*
+        Metodo usado para alterar um bit da mensagem, caso o usuário do
+    programa queria alterar o valor de algum bit. Assim gerando um erro.
+    */
     private static String geraErro(String msg, int posicao) {
         if (posicao >= 0 && posicao < msg.length()) {
             msg = giraString(msg);
@@ -215,7 +260,7 @@ public class HammingGIT {
             for (int i = 0; i < charray.length; i++) {
                 msg += charray[i];
             }
-            System.out.println("Alterando mensagem.\nMensagem atual:"+giraString(msg)+".\n----------------------------------");
+            System.out.println("Alterando mensagem.\nMensagem atualizada:"+giraString(msg)+".\n----------------------------------");
             msg = giraString(msg);
             return msg;
         } else 
@@ -223,6 +268,9 @@ public class HammingGIT {
         return msg;
     }
     
+    /*
+        Metodo que transforma valores binarios para decimal.
+    */
     private static int binarioToDeci(String bina)
     {
         int valor = 0;int c = 0;
@@ -237,4 +285,3 @@ public class HammingGIT {
     }
     
 }
-
