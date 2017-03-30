@@ -10,7 +10,7 @@ public class HammingGIT {
         String mensagemComRedundancia;
         String retorno ="";
         Scanner l = new Scanner(System.in);
-        System.out.print("Emissor\nDigite sua mensagem\n");
+        System.out.print("Emissor -\nDigite sua mensagem\n");
         String entrada = l.nextLine();
         int r = descobrirQuantidadeR(entrada.length());
 
@@ -22,6 +22,7 @@ public class HammingGIT {
         if ("y".equals(l.nextLine())) {
             System.out.println("Digite o posicao que quer alterar de 1 a " + (mensagemComRedundancia.length()) + ".");
             int posicao = l.nextInt();
+            System.out.println("\n");
             mensagemComRedundancia = geraErro(mensagemComRedundancia, posicao - 1);
         }
         
@@ -31,15 +32,15 @@ public class HammingGIT {
     public static void receptor(String msgComR, int r) {
         String retorno;
         
-        System.out.println("\nReceptor");
+        System.out.println("\nReceptor -");
         msgComR = giraString(msgComR);
         retorno = valorDeCadaR(r, msgComR);
         if(contaUns(retorno, 'a'))
         {
             System.out.println("Teve erro.\nRetorno: "+retorno+"\nCorrigindo erro...\n");
-            //receptor(geraErro(msgComR, binarioToDeci(retorno)), r);  // O ERRO TA AQUI SE VIRA
+            receptor(geraErro(giraString(msgComR), binarioToDeci(retorno) -1), r); 
         }else
-            System.out.println("Não teve erro.\nRetorno: "+retorno+"\nEnvia mensagem.");
+            System.out.println("Não teve erro.\nRetorno: "+retorno+"\nEnviando a mensagem: "+giraString(msgComR)+".");
     }
 
     public static String emissor(String hamming, int r) {
@@ -203,7 +204,6 @@ public class HammingGIT {
 
     private static String geraErro(String msg, int posicao) {
         if (posicao >= 0 && posicao < msg.length()) {
-            System.out.println("\nMensagem SEM erro:"+msg);
             msg = giraString(msg);
             char[] charray = msg.toCharArray();
             if (charray[posicao] == '0')
@@ -215,7 +215,7 @@ public class HammingGIT {
             for (int i = 0; i < charray.length; i++) {
                 msg += charray[i];
             }
-            System.out.println("Mensagem COM erro:"+giraString(msg)+"\n----------------------------------");
+            System.out.println("Alterando mensagem.\nMensagem atual:"+giraString(msg)+".\n----------------------------------");
             msg = giraString(msg);
             return msg;
         } else 
@@ -238,6 +238,3 @@ public class HammingGIT {
     
 }
 
-
-
-// 
